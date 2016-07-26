@@ -1,10 +1,9 @@
 <?php
 require 'dbconfig.php';
-
 $email    = $_POST['email'];
 $password = $_POST['pwd'];
 $pwd = password_hash($password, PASSWORD_BCRYPT);
-$searchUser = "SELECT * FROM $tbl_name WHERE email = '$_POST[email]' ";
+$searchUser = "SELECT * FROM $tbl_name WHERE email = '$email' ";
 $result = $connection->query($searchUser);
 $count = mysqli_num_rows($result);
 if ($count == 1) {
