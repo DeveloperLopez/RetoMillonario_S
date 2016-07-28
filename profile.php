@@ -16,7 +16,7 @@ $jsondata = array();
 if (!preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/",$email)) {
     $jsondata['message'] = "Correo electrónico incorrecto";
 } else {
-    $searchUser = "SELECT * FROM $tbl_name WHERE email = '$email' ";
+    $searchUser = "SELECT * FROM $tbl_name WHERE id != '$id' AND email = '$email' ";
     $result = $connection->query($searchUser);
     $count = mysqli_num_rows($result);
     // Verify new email
@@ -25,6 +25,19 @@ if (!preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/",$email)) {
     } else {
         $sql = "UPDATE $db_name.$tbl_name SET email = '$email', name = '$name', born = '$born', dni = '$dni', tel = '$tel', dep = '$dep', city = '$city' WHERE users.id = '$id'";
         if ($connection->query($sql) === TRUE) {
+            // Require data for store on JSON
+            $sql = "SELECT * FROM $tbl_name WHERE id = '$id'";
+            $result = $connection->query($sql);
+            $row = $result->fetch_array(MYSQLI_ASSOC);
+
+            $jsondata['name']      = $row['name'];
+            $jsondata['born']      = $row['born'];
+            $jsondata['dni']       = $row['dni'];
+            $jsondata['email']     = $row['email'];
+            $jsondata['tel']       = $row['tel'];
+            $jsondata['dep']       = $row['dep'];
+            $jsondata['city']      = $row['city'];
+            $jsondata['id']        = $row['id'];
             $jsondata['message'] = "Datos actualizados correctamente.";
         } else {
             $jsondata['message'] = "Error al actualizar." . $sql . "<br>" . $connection->error;
@@ -37,23 +50,12 @@ function check_input($data, $problem='') {
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
     if ($problem && strlen($data) == 0) {
-        echo($problem);
+        $jsondata['message'] = $problem;
+        echo json_encode($jsondata);
 	    exit();
     }
     return $data;
 }
-// Require data for store on JSON
-$sql = "SELECT * FROM $tbl_name WHERE id = '$id'";
-$result = $connection->query($sql);
-$row = $result->fetch_array(MYSQLI_ASSOC);
-
-$jsondata['name']      = $row['name'];
-$jsondata['born']      = $row['born'];
-$jsondata['dni']       = $row['dni'];
-$jsondata['email']     = $row['email'];
-$jsondata['tel']       = $row['tel'];
-$jsondata['dep']       = $row['dep'];
-$jsondata['city']      = $row['city'];
 
 echo json_encode($jsondata);
 mysqli_close($connection);
