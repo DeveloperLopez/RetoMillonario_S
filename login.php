@@ -12,6 +12,7 @@ if ($result->num_rows == 0) {
     if (password_verify($password, $row['password'])) {
         $jsondata['id']      = $row['id'];
         $jsondata['email']   = $row['email'];
+        $jsondata['photo']   = $row['photo'];
         $jsondata['message'] = 'Sesión iniciada';
     } else {
         $jsondata['message'] = 'Contraseña incorrecta';
